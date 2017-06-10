@@ -1,11 +1,8 @@
 BASE_RATING = 8.0
 
-if ARGV.any?
-  file_name = ARGV[0]
-else
-  file_name = 'movies.txt'
-  puts "Warning! File name wasn't passed. Movies.txt is used by default.\n\n"
-end
+file_name = ARGV[0] || 'movies.txt'
+
+abort("File #{file_name} not found.") unless File.exist?(file_name)
 
 File.open(file_name, 'r').each do |line|
   movie_data = line.split('|')
