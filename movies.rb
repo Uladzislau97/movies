@@ -55,4 +55,4 @@ movies.map { |movie| movie[:producer] }
       .each { |producer| puts producer }
 
 puts "\n\nКоличество фильмов, снятых не в США\n\n"
-puts movies.count { |movie| movie[:country] != 'USA' }
+puts(movies.count { |movie| movie[:country] != 'USA' })
