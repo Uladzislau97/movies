@@ -20,28 +20,25 @@ def movie_format(movie)
   " - #{movie[:length]} min"
 end
 
-movies = []
-
-File.open(file_name, 'r').each do |line|
+movies = File.open(file_name, 'r').map do |line|
   movie_data = line.split('|')
-  movie = {
+  {
     link: movie_data[0],
     title: movie_data[1],
     year: movie_data[2].to_i,
     country: movie_data[3],
     date: string_to_date(movie_data[4]),
     genres: movie_data[5].split(','),
-    length: movie_data[6].split.first.to_i,
+    length: movie_data[6].to_i,
     rating: movie_data[7].to_f,
     producer: movie_data[8],
-    actors: movie_data[9].split(/[,\n]/)
+    actors: movie_data[9].chomp.split(',')
   }
-
-  movies << movie
 end
 
 puts "\n\n5 самых длинных фильмов\n\n"
-movies.sort { |x, y| y[:length] <=> x[:length] }
+movies.sort_by { |movie| movie[:length] }
+      .reverse
       .take(5)
       .each { |movie| puts movie_format(movie) }
 
@@ -58,4 +55,4 @@ movies.map { |movie| movie[:producer] }
       .each { |producer| puts producer }
 
 puts "\n\nКоличество фильмов, снятых не в США\n\n"
-puts movies.count { |movie| movie[:country] != 'USA' }.to_s
+puts movies.count { |movie| movie[:country] != 'USA' }
