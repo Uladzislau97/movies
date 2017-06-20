@@ -22,18 +22,31 @@ def movie_format(movie)
   " - #{movie.length} min"
 end
 
-movies = CSV.read(file_name, col_sep: '|').map do |movie_data|
+headers = %I[
+  link
+  title
+  year
+  country
+  date
+  genres
+  length
+  rating
+  producer
+  actors
+]
+
+movies = CSV.read(file_name, col_sep: '|', headers: headers).map do |movie_data|
   OpenStruct.new(
-    link: movie_data[0],
-    title: movie_data[1],
-    year: movie_data[2].to_i,
-    country: movie_data[3],
-    date: string_to_date(movie_data[4]),
-    genres: movie_data[5].split(','),
-    length: movie_data[6].to_i,
-    rating: movie_data[7].to_f,
-    producer: movie_data[8],
-    actors: movie_data[9].chomp.split(',')
+    link: movie_data[:link],
+    title: movie_data[:title],
+    year: movie_data[:year].to_i,
+    country: movie_data[:country],
+    date: string_to_date(movie_data[:date]),
+    genres: movie_data[:genres].split(','),
+    length: movie_data[:length].to_i,
+    rating: movie_data[:rating].to_f,
+    producer: movie_data[:producer],
+    actors: movie_data[:actors].chomp.split(',')
   )
 end
 
@@ -59,10 +72,10 @@ puts "\n\nКоличество фильмов, снятых не в США\n\n"
 puts(movies.count { |movie| movie.country != 'USA' })
 
 puts "\n\nКоличество фильмов по месяцам\n\n"
-movies.sort { |x, y| x.date.month <=> y.date.month }
-      .group_by { |movie| movie.date.month }
+movies.map(&:date)
+      .group_by(&:month)
+      .sort_by(&:first)
       .to_a
-      .each do |pair|
-        puts "#{Date::MONTHNAMES[pair[0]]}: " \
-             "#{pair[1].inject(0) { |sum, _| sum + 1 }}"
+      .each do |month, group|
+        puts "#{Date::MONTHNAMES[month]}: #{group.count}"
       end
