@@ -11,7 +11,7 @@ puts movies
 puts '*' * 100
 puts movies.sort_by(:date).first(5)
 puts '*' * 100
-puts movies.filter(genre: 'Comedy').first(5)
+puts movies.filter(year: 1982..1985, title: /terminator/i).first(5)
 puts '*' * 100
 puts movies.stats(:producer)
 puts '*' * 100

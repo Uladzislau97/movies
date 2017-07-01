@@ -1,3 +1,4 @@
+require './movie_collection'
 require 'date'
 
 class Movie
@@ -6,25 +7,25 @@ class Movie
   attr_reader :link, :title, :year, :country, :date, :genres, :length, :rating,
               :producer, :actors
 
-  @@genres = []
-
-  def initialize(link, title, year, country, date, genres, length, rating, producer, actors)
+  def initialize(link, title, year, country, date, genres, length, rating,
+                 producer, actors, collection)
     @link = link
     @title = title
     @year = year
     @country = country
     @date = date
     @genres = genres
-    @@genres += genres
-    @@genres.uniq!
     @length = length
     @rating = rating
     @producer = producer
     @actors = actors
+    @collection = collection
   end
 
   def has_genre?(genre)
-    raise ArgumentError, 'No such genre' unless @@genres.include?(genre)
+    unless @collection.genres.include?(genre)
+      raise ArgumentError, 'No such genre'
+    end
 
     @genres.include?(genre)
   end

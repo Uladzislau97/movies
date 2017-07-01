@@ -15,7 +15,10 @@ class MovieCollection
     actors
   ].freeze
 
+  attr_reader :genres
+
   def initialize(file_name)
+    @genres = []
     @movies = get_movies(file_name)
   end
 
@@ -24,22 +27,16 @@ class MovieCollection
   end
 
   def sort_by(field)
-    @movies.sort_by { |movie| movie.send(field.to_s) }
+    @movies.sort_by(&field)
   end
 
-  def filter(field)
-    if field.keys.first == :genre
-      @movies.select do |movie|
-        movie.genres.include?(field.values.first)
+  def filter(fields)
+    @movies.reduce([]) do |result, movie|
+      next result unless fields.keys.all? do |k|
+        matches_filter?(movie, k, fields[k])
       end
-    elsif field.keys.first == :actors
-      @movies.select do |movie|
-        movie.actors.include?(field.values.first)
-      end
-    else
-      @movies.select do |movie|
-        movie.send(field.keys.first.to_s) == field.values.first
-      end
+
+      result << movie
     end
   end
 
@@ -61,19 +58,32 @@ class MovieCollection
 
   private
 
+  def matches_filter?(movie, field, value)
+    if movie.respond_to?(field)
+      value === movie.send(field.to_s)
+    else
+      movie.send("#{field}s").include?(value)
+    end
+  end
+
   def get_movies(file_name)
     CSV.read(file_name, col_sep: '|', headers: HEADERS).map do |movie_data|
+      genres = movie_data[:genres].split(',')
+      @genres += genres
+      @genres.uniq!
+
       Movie.new(
         movie_data[:link],
         movie_data[:title],
         movie_data[:year].to_i,
         movie_data[:country],
         string_to_date(movie_data[:date]),
-        movie_data[:genres].split(','),
+        genres,
         movie_data[:length].to_i,
         movie_data[:rating].to_f,
         movie_data[:producer],
-        movie_data[:actors].chomp.split(',')
+        movie_data[:actors].chomp.split(','),
+        self
       )
     end
   end
