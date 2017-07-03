@@ -11,14 +11,14 @@ class Movie
                  producer, actors, collection)
     @link = link
     @title = title
-    @year = year
+    @year = year.to_i
     @country = country
-    @date = date
-    @genres = genres
-    @length = length
-    @rating = rating
+    @date = string_to_date(date)
+    @genres = genres.split(',')
+    @length = length.to_i
+    @rating = rating.to_f
     @producer = producer
-    @actors = actors
+    @actors = actors.chomp.split(',')
     @collection = collection
   end
 
@@ -28,6 +28,14 @@ class Movie
     end
 
     @genres.include?(genre)
+  end
+
+  def matches_filter?(field, value)
+    if respond_to?(field)
+      value === send(field.to_s)
+    else
+      send("#{field}s").include?(value)
+    end
   end
 
   def rating_stars
@@ -46,5 +54,11 @@ class Movie
     "genres: [#{@genres.join(',')}], length: #{@length} min, " \
     "rating: #{@rating}, producer: #{@producer}, " \
     "actors: [#{@actors.join(',')}]>"
+  end
+
+  private
+
+  def string_to_date(date)
+    Date.new(*date.split('-').map(&:to_i))
   end
 end
