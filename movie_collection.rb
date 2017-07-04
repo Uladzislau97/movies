@@ -29,26 +29,16 @@ class MovieCollection
   end
 
   def filter(fields)
-    @movies.reduce([]) do |result, movie|
-      next result unless fields.keys.all? do |k|
-        movie.matches_filter?(k, fields[k])
-      end
-
-      result << movie
-    end
-
-    fields.reduce(@movies) do |result, field|
+    fields.reduce(@movies) do |result, (name, value)|
       result.select do |movie|
-        movie.matches_filter?(field[0], field[1])
+        movie.matches_filter?(name, value)
       end
     end
   end
 
   def stats(field)
-    stats = {}
     @movies.group_by { |movie| movie.send(field.to_s) }
-           .each { |k, v| stats[k] = v.count }
-    stats
+           .each_with_object({}) { |(k, v), h| h[k] = v.count }
   end
 
   def genres
