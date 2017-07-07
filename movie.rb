@@ -5,10 +5,10 @@ class Movie
   BASE_RATING = 8.0
 
   attr_reader :link, :title, :year, :country, :date, :genres, :length, :rating,
-              :producer, :actors
+              :producer, :actors, :price
 
   def initialize(link, title, year, country, date, genres, length, rating,
-                 producer, actors, collection)
+                 producer, actors, collection, price = 0)
     @link = link
     @title = title
     @year = year.to_i
@@ -20,6 +20,7 @@ class Movie
     @producer = producer
     @actors = actors.chomp.split(',')
     @collection = collection
+    @price = price
   end
 
   def has_genre?(genre)
