@@ -16,7 +16,6 @@ class MovieCollection
   ].freeze
 
   def initialize(file_name)
-    @genres = []
     @movies = get_movies(file_name)
   end
 
